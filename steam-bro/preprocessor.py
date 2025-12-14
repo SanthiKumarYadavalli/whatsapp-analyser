@@ -30,10 +30,14 @@ def preprocess(data , pattern=24):
         entry = re.split("([\w\W]+?):\s",message)
         if entry[1:]: # if it is user message (uname : message)
             users.append(entry[1])
-            messages.append(entry[2].replace("\n", " ").strip()) # \n removal
+            msg = entry[2]
         else: # if it is notification chat without user name
             users.append("notification")
-            messages.append(entry[0].replace("\n", " ").strip()) # \n removal
+            msg = entry[0]
+        msg = msg.replace("\n", " ").strip() # \n removal
+        msg = msg.replace("This message was deleted","")
+        msg = msg.replace("<This message was edited>","")
+        messages.append(msg)
     df["user"] = users
     df["message"] = messages
     df.drop(columns=["user_message"] , inplace=True)

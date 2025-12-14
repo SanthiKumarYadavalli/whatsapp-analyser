@@ -37,12 +37,20 @@ def most_busy_users(df):
     )
     return top_users_df , df
 
+
+def remove_urls(message):
+    for link in extract.find_urls(message):
+        message = message.replace(link , "")
+    return message
+
+
 def create_word_cloud(user , df):
     if user != "Overall":
         df = df[df["user"] == user]
 
     wc = WordCloud(width=500 , height=500 , min_font_size=10 , background_color='white')
     df = df[df["message"] != "<Media omitted>"]
+    df["message"] = df["message"].apply(remove_urls)
     # generate() takes a string and split to words 
     df_wc = wc.generate(df["message"].str.cat(sep=" "))
     return df_wc
