@@ -13,7 +13,16 @@ def preprocess(data , pattern=24):
         "user_message": messages,
         "message_date": dates,
     })
-    df["date"] = pd.to_datetime(df["message_date"], format="%d/%m/%Y, %H:%M - ")
+    # Parsing date time
+    old_timestamp_pattern = r"\d{2}/\d{2}/\d{4},\s\d{1,2}:\d{2}\s-\s"
+    new_timestamp_pattern = r"\d{1,2}/\d{1,2}/\d{2},\s\d{1,2}:\d{2}\s-\s"
+    if re.match(old_timestamp_pattern, df["message_date"][0]):
+        df["date"] = pd.to_datetime(df["message_date"], format="%d/%m/%Y, %H:%M - ")
+    elif re.match(new_timestamp_pattern, df["message_date"][0]):
+        df["date"] = pd.to_datetime(df["message_date"], format="%m/%d/%y, %H:%M - ")
+    else:
+        raise ValueError("Invalid format!")
+
     users = []
     messages = []
     for message in df["user_message"]:
@@ -21,10 +30,10 @@ def preprocess(data , pattern=24):
         entry = re.split("([\w\W]+?):\s",message)
         if entry[1:]: # if it is user message (uname : message)
             users.append(entry[1])
-            messages.append(entry[2])
+            messages.append(entry[2].replace("\n", " ").strip()) # \n removal
         else: # if it is notification chat without user name
             users.append("notification")
-            messages.append(entry[0])
+            messages.append(entry[0].replace("\n", " ").strip()) # \n removal
     df["user"] = users
     df["message"] = messages
     df.drop(columns=["user_message"] , inplace=True)

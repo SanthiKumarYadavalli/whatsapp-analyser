@@ -16,7 +16,7 @@ def fetch_stats(user , df):
         words.extend(message.split())
     
     # we can able to match if it was ending with (file attached) this will be used in when extracgted with media
-    no_of_media_messages = df[df["message"] == "<Media omitted>\n" ].shape[0]
+    no_of_media_messages = df[df["message"] == "<Media omitted>" ].shape[0]
 
 
     # no of links shared
@@ -42,7 +42,7 @@ def create_word_cloud(user , df):
         df = df[df["user"] == user]
 
     wc = WordCloud(width=500 , height=500 , min_font_size=10 , background_color='white')
-    df = df[df["message"] != "<Media omitted>\n"]
+    df = df[df["message"] != "<Media omitted>"]
     # generate() takes a string and split to words 
     df_wc = wc.generate(df["message"].str.cat(sep=" "))
     return df_wc
@@ -57,7 +57,7 @@ def most_common_words(selected_user,df):
         df= df[df['user'] == selected_user]
     
     temp = df[df['user'] != 'notification']
-    temp=temp[temp['message'] != '<Media omitted>\n']
+    temp=temp[temp['message'] != '<Media omitted>']
 
     words=[]
 
